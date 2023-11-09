@@ -7,13 +7,12 @@ export default {
     return {};
   },
   methods: {
-
     ...mapMutations(["delUserFromList"]),
 
-    logoutUserAndRedirectToHome(){
-        this.$store.commit("delUserFromList", {data: this.userData[0]})
-        this.$router.push({name: "home"})
-    }
+    logoutUserAndRedirectToHome() {
+      this.$store.commit("delUserFromList", { data: this.userData[0] });
+      this.$router.push({ name: "home" });
+    },
   },
 
   computed: {
@@ -30,8 +29,8 @@ export default {
     <h1>This is Profile Page of User</h1>
     <ul v-for="user in userData" :key="user.id" class="listOfUser">
       <div class="userName">
-        <p>Name:</p>
-        <li>{{ user.firstName }}</li>
+        <p class="emailTitle">Email:</p>
+        <li>{{ user.email }}</li>
       </div>
 
       <div class="userPassword">
@@ -52,6 +51,11 @@ export default {
   align-items: center;
   justify-content: space-around;
   font-weight: bold;
+}
+
+.emailTitle {
+  width: 150px;
+  margin-right: 25px;
 }
 
 .userPassword {

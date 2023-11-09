@@ -1,33 +1,43 @@
 <script>
-import { mapMutations } from "vuex";
+import { mapMutations, mapActions } from "vuex";
 export default {
   props: {},
   name: "HomeView",
   data() {
     return {
       isActive: false,
-      name: null,
+      email: null,
       password: null,
     };
   },
   methods: {
     ...mapMutations(["addUserToList"]),
 
-    addDetails() {
-
-      
-
-      if (!this.name || !this.password) {
+    async addDetails() {
+      if (!this.email || !this.password) {
         return alert("Fill All details");
       } else {
-        this.$store.commit("addUserToList", {
-          name: this.name,
-          password: this.password,
-        });
-        this.name = "";
-        this.password = "";
-        this.isActive = false;
-        this.$router.push({ name: "profile" });
+        // this.$store.commit("addUserToList", {
+        //   name: this.name,
+        //   password: this.password,
+        // });
+
+        try {
+          await this.$store.dispatch("login", {
+            email: this.email,
+            password: this.password,
+          });
+          this.email = "";
+          this.password = "";
+          this.isActive = false;
+          console.log("beforeRouting");
+          this.$router.push({ name: "profile" });
+          console.log("AfterRouting");
+        } catch (err) {
+          console.log("error in compo");
+          console.log(err);
+          this.$router.push({ name: "error" });
+        }
       }
     },
     closeModal() {
@@ -60,8 +70,13 @@ export default {
 
       <form v-on:submit.prevent="submitForm">
         <div class="fieldName">
-          <label for="name">Name: </label>
-          <input type="text" id="name" placeholder="type here" v-model="name" />
+          <label for="email">Email: </label>
+          <input
+            type="email"
+            id="email"
+            placeholder="type here"
+            v-model="email"
+          />
         </div>
 
         <div class="fieldPassword">
