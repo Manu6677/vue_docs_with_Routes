@@ -35,13 +35,15 @@ const store = createStore({
 
   mutations: {
     addUserToList(state, payload) {
-      console.log(payload.data.token);
-      console.log(payload);
+      console.log("inside addUserToList");
 
-      console.log(payload.config.data);
-
-      let token = payload.data.token;
-      if (token) {
+      if (!payload?.data) {
+        state.userData.push({
+          id: 1,
+          email: state.email,
+          password: state.password,
+        });
+      } else if (payload.data.token) {
         console.log("inside if true");
 
         let parsing = JSON.parse(payload.config.data);
@@ -58,9 +60,9 @@ const store = createStore({
     },
 
     delUserFromList(state, payload) {
-      console.log(payload, "delete");
       console.log(payload.data, "delete");
-      console.log(payload.data.id, "delete");
+      console.log(payload.data.key, "delete");
+
       let index = state.userData.findIndex(
         (user) => user.id === payload.data.id
       );
@@ -75,15 +77,19 @@ const store = createStore({
       console.log(payload);
       state.email = payload.email;
       state.password = payload.password;
-
       try {
         const response = await axios.post(
           "https://reqres.in/api/login",
           payload
         );
+        console.log(response);
         commit("addUserToList", response);
       } catch (err) {
         console.log(err);
+        console.log(err.response.status);
+        if (err.response.status === 400) {
+          commit("addUserToList", payload);
+        }
         throw err;
       }
     },
@@ -96,4 +102,3 @@ const app = createApp(App).component("font-awesome-icon", FontAwesomeIcon);
 app.use(store);
 app.use(router);
 app.mount("#app");
-// createApp(App).use(router).mount('#app')

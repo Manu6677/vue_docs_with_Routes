@@ -1,0 +1,206 @@
+(1) ref() = In the composition API ref() is the recommmended way to declare the reactive state
+
+(2) Top level imports, variable and function in the <script setup> are automatically usable in the template of the same component.
+    Think of the template as a JavaScript function declared in the same scope - it naturally has access to everything declared alongside it.
+
+(3) When you use a ref in a template, and change the ref's value later, Vue automatically detects the change and updates the DOM accordingly. This is made possible with a dependency-tracking based reactivity system. 
+    When a component is rendered for the first time, Vue tracks every ref that was used during the render. Later on, when a ref is mutated, it will trigger a re-render for components that are tracking it.
+
+(4) Refs can hold any value type, including deeply nested objects, arrays, or JavaScript built-in data structures like Map.
+
+(5) Computed:
+      However, the difference is that computed properties are cached based on their reactive dependencies. A computed property will only re-evaluate when some of its reactive dependencies have changed. 
+      This means as long as author.books has not changed, multiple access to publishedBooksMessage will immediately return the previously computed result without having to run the getter function again.
+      
+    5.1)--> Return value from a computed property is deroved state never mutate it.Think of it as a snapshot
+    5.2)--> By default Computed is getter.
+    5.3)--> Don't make async requests or mutate the DOM inside a computed getter!
+        --> Think of a computed property as declaratively describing how to derive a value based on other values - its only responsibility should be computing and returning that value.
+
+(6) A common need for data binding is manipulating an element's class list and inline styles
+
+(7) This keyword works because Vue creates a global application object behind the scenes, placing the data properties and methods in the same scope, and therefore of the same calling object.
+ That means that the this keyword is undefined. This relates to how Javascript works, not Vue specifically.
+
+ --> Earlier we mentioned that Vue creates a global object in the background that puts the data properties and methods in the same scope.
+ --> When we invoke a regular function, the value of this equals to the global object. So this has access to username and will work as expected.
+ --> An arrow function doesn’t have its own this . An arrow function inherits its this from the closest non-arrow parent function.
+ --> Because there is no outer non-arrow function, there is no this it can inherit from. Therefore the arrow function’s this is undefined and we get the error in the console.
+ --> A good rule to remember is to use regular functions as outer functions and arrow functions as inner functions, if there is a need. In most cases the code can be refactored in a way that removes the need for an arrow function.
+
+(8) Very Very IMP in v-for sequence is important (value, key, index) value means obj value, key means key ND index is obvious
+     --> If you change the sequence of (value, key, index) to (key, value, index) then key point value and value point key
+      --> hence first sequence is imp (value, key, index)
+
+(9) Remember v-if has a higher precedence than the v-for hence can not access the variables of v-if from v-for
+    : WRONG WAY  --> <li v-for="todo in todos" v-if="!todo.isComplete">
+                          {{ todo.name }}
+                      </li>
+
+    : RIGHT WAY --> <template v-for="todo in todos">
+                       <li v-if="!todo.isComplete">
+                          {{ todo.name }}
+                       </li>
+                    </template>
+
+10)  Vue $emit is a function that lets us emit, or send, custom events from a child component to its parent.
+       because it is used to notify the parent component that something changed, 
+         It facilitates communication not only between the child and parent components,
+           but also between sibling components who are separated., and it is the best way to trigger certain events.
+
+11) git cmd to create branches from main branch
+    -> 11.1) git checkout main
+    -> 11.2) git checkout -b todo
+
+12) Vue implements its own component model that -> Allow us to encapsulate custom content and logic in each component.
+
+13) There are two ways to register the component 1) Globally and locally:
+   --> Globally:  app.component(
+
+           // the registered name
+           'MyComponent',
+
+          // the implementation
+              {
+               /* ... */
+              } ) 
+
+    --> The global component can be chained: app
+                                              .component('ComponentA', ComponnetA)
+                                              .component('ComponentB', ComponnetB)
+                                              .component('ComponentC', ComponnetC)
+
+  ==> Drawbacks of Global Registration: 1) Global registerion prevents build system from removing unused components(a.k.a Treeshaking)
+                                            If you globally register a component but end up not using it anywhere in your app, it will still be included in the final bundle.
+
+    2) Global registration makes dependency relationships less explicit in large applications.
+         It makes it difficult to locate a child component's implementation from a parent component using it.
+         This can affect long-term maintainability similar to using too many global variables.    
+                     
+    3) Local registration scopes the availability of the registered components to the current component only.
+          It makes the dependency relationship more explicit, and is more tree-shaking friendly.
+
+   V.V.IMP - "Note that locally registered components are not also available in descendant components"
+
+
+14) Component Name Casing:
+   1) <PascalCase /> makes it more obvious that this is a Vue component instead of a native HTML element in templates.
+   It also differentiates Vue components from custom elements (web components).
+   2) If you are authoring your templates directly in a DOM, the template will be subject to the browser's native HTML parsing behavior. 
+      In such cases, you will need to use kebab-case and explicit closing tags for components:
+
+
+15) Slot element is a slot outlet that indicates where the parent-provided slot content should be rendered.
+     -> slot not limited to Text only we can pass multiple "elements" and Other "Components" too.
+
+    15.1) Slot Fallback Content: We can provide slot in child component like it: <slot> ChildSlot </slot>
+          -> If there is no Expressions in parent component then by default child component's slot rendered
+          -> But there is a Expressions present in parent then Expression of parent's component is rendered instead of child.
+
+    15.2) Named Slot:
+          -> Directives: v-slot:header ==> #header, v-slot ==> #[header] for dynamic values 
+                   
+    v.IMP:--> We can send multiple slot to a child component and get them as a named slot 
+           to remember where to render which slot 
+
+          <ParentComponent>        <ChildComponent>
+                 
+         <template #header>         <header> 
+            <h1>page title</h1>       <slot name="header"></slot>
+         </template>                </header>
+
+         <template #footer>         <footer>
+        <p> contact </p>              <slot name="footer"></slot> 
+         </template>                </footer>
+
+   
+    15.3) Slot use for passing props - [ i saw example: passing props slot from child to parent component]
+    15.4) Remember sloting done on template or Component
+
+
+16) Dynamic component: 
+    16.1) :is, use when switching between multiple components <component is: ".." >
+          a component will be unmounted when it is switched away from. 
+
+
+          ------------------------------ Vuex -----------------------------------
+
+17) StateManagement --> State --> View --> Action
+     17.1) Multiple views may depend on the same State
+     17.2) Actions from different views may need to mutate same piece of state
+       
+       ==> StateManagement with reactive API's
+
+    17.3) You can create a store to share the piece of state, can use reactive() to create reactibe object and 
+    then import into multiple components.
+    17.4) While this works in simple cases, global state that can be arbitrarily mutated by any component is not going to be very maintainable in the long run. 
+          To ensure the state-mutating logic is centralized like the state itself, it is recommended to define methods on the store with names that express the intention of the actions:
+
+
+18) mapFields -> By adding our state fields to mapFields within our computed object in Vue.js
+                 ->we can map those fields to v-model within input text fields to save form state!
+                   -> The state remains the same even when we change components or pages in our Vue app
+
+19) Plugins -> Vuex stores accept the plugins option that exposes hooks for each mutation. 
+            -> A Vuex plugin is simply a function that receives the store as the only argument
+             
+            -> Plugins are not allowed to directly mutate state - similar to your components, they can only trigger changes by committing mutations.
+
+20) Plugins - There are five plugins in Vuex
+
+            -> 1) Vuex persistedstate: Uses the browser’s local storage to persist your state across sessions. 
+                  This means that refreshing the page or closing a tab won’t wipe your data.     
+
+            -> 2) Vuex shared mutations: synchronizes state between different browser tabs. It does this by storing a mutation to local storage. 
+                  The storage event triggers an update in all other tabs/windows, which replays the mutation, thus keeping state in sync.    
+
+            -> 3) Language Localization (vuex-il8n): allows you to easily store content in multiple languages       
+                  One cool feature is that you can store strings with tokens e.g. “Hello {name}, this is your Vue.js app.”
+
+            -> 4) Managing multiple loading states: (vuex-loading) helps to manage multiple loading states in your application. 
+                  This plugin is handy for real-time apps where changes in state are frequent and complex.      
+
+            -> 5) Caching Actions: (Vuex-cache) cache your Vuex actions. For example, if you’re retrieving data from a server, 
+                  this plugin will cache the result the first time you call the action, then return the cached value on subsequent dispatches. 
+                  It’s trivial to clear the cache when necessary.
+
+
+21) Built-in Logger plugin: Vuex comes with a logger plugin for common debugging usage
+
+---------------------------Protected Routes------------------------------
+
+1) Global Resolve Gaurds ==> beforeEach, beforeResolve, afterEach
+  
+   -router.beforeEach(): it is triggers on every navigation is confirmed, but resolve gaurds are called right BEFORE NAVIGATION IS CONFIRMED,
+      after all in-component Gaurds and async route component are resolved
+   
+
+
+2) In-Component Gaurds ==> beforeRouteUpdate() , beforeRouteLeave
+   
+    -beforeRouteUpdate() => It is called when the route that render this component has changed, but this component is reused in new route
+    -beforeRouteLeave() => it is called when the route that renders this component is about to be navigated away from
+
+doubt:
+28 oct 2023
+1) exp: customerDetailsArry se on value same as declared values any effect occur
+2) emit name varibale same name occur any effect
+
+custom elements (web components) ?
+Prop full guide section left to read
+slot full guide left
+
+30-Oct: 
+-what is it
+-Slot content does not have access to the child component's data. 
+-Expressions in Vue templates can only access the scope it is defined in ?
+-Names scoped slots ?
+-:is
+
+31-Oct:
+-Why not to do a async operations in computed 
+- v-show or v-if diff
+
+
+
+

@@ -29,14 +29,11 @@ export default {
           });
           this.email = "";
           this.password = "";
-          this.isActive = false;
-          console.log("beforeRouting");
+          this.isActive = false;  
           this.$router.push({ name: "profile" });
-          console.log("AfterRouting");
-        } catch (err) {
-          console.log("error in compo");
-          console.log(err);
+        } catch (err) {       
           this.$router.push({ name: "error" });
+
         }
       }
     },
